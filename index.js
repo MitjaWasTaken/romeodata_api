@@ -21,9 +21,7 @@ async function findWagon(number, type, past) {
     }`;
 
     const url = `${apiUrl}/compositions/${departure_date}`;
-
     const response = await fetch(url, { method: "GET", headers: headers });
-
     const json = await response.json();
 
     var allTrainNumbers = findTrainNumbers(json, number, type);
@@ -123,10 +121,6 @@ app.get("/sm5/:number", async function (req, res) {
         req.query.past || false
     );
     res.send(trainNumbers);
-});
-
-app.get("/timetable/:station", function (req, res) {
-    res.send();
 });
 
 app.listen(3000);
