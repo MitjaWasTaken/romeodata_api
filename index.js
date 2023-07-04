@@ -4,6 +4,7 @@ import fetch from "node-fetch";
 import { apiUrl, wagonTypes } from "./constants.js";
 
 const app = express();
+const port = 4282;
 
 async function findWagon(number, type, past) {
     var headers = {
@@ -123,4 +124,6 @@ app.get("/sm5/:number", async function (req, res) {
     res.send(trainNumbers);
 });
 
-app.listen(3000);
+app.listen(port, () => {
+    console.log(`Running on port ${port}`)
+})
