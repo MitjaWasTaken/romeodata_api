@@ -1,17 +1,35 @@
 import express from "express";
 import fetch from "node-fetch";
+import { appendFile, writeFile } from "fs";
 
 import { apiUrl, wagonTypes } from "./constants.js";
 
 const app = express();
 const port = 4282;
 
+const logFilePath = `./logs/${new Date().toLocaleDateString("fi", {
+    day: "numeric",
+    month: "numeric",
+    year: "2-digit",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+})}`;
+writeFile(
+    logFilePath,
+    `Log starting form ${Date().toLocaleString()}:\n\n`,
+    function (err) {
+        if (err) throw err;
+        console.log("Log file created!");
+    }
+);
+
 /**
- * 
- * @param {String} number 
- * @param {String} type 
- * @param {String} past 
- * @returns 
+ *
+ * @param {String} number
+ * @param {String} type
+ * @param {String} past
+ * @returns
  */
 async function findWagon(number, type, past) {
     var headers = {
@@ -104,6 +122,24 @@ var wagonNumberWithLeadingZero = (num) => {
     return (parseInt(num) < 10 && num.length == 1 ? "0" : "") + num;
 };
 
+/**
+ *
+ * @param {String} ip
+ * @param {String} url
+ * @param {*} trainNumbers
+ */
+function log(ip, url, trainNumbers) {
+    const log = `{${new Date().toLocaleString()}} Request from ${ip} to ${url}! Returned ${
+        trainNumbers.past.length + trainNumbers.future.length
+    } train(s)`;
+
+    console.log(log);
+    appendFile(logFilePath, log + "\n", function (err) {
+        if (err) console.error(err);
+        return;
+    });
+}
+
 app.get("/sm2/:number", async function (req, res) {
     const number = wagonNumberWithLeadingZero(req.params.number);
     const trainNumbers = await findWagon(
@@ -111,7 +147,7 @@ app.get("/sm2/:number", async function (req, res) {
         wagonTypes.sm2,
         req.query.past || false
     );
-    console.log(`{${new Date().toLocaleString()}} Request from ${req.ip} to ${req.url}! Returned ${trainNumbers.past.length + trainNumbers.future.length} train(s)`);
+    log(req.ip, req.url, trainNumbers);
     res.send(trainNumbers);
 });
 
@@ -122,7 +158,7 @@ app.get("/sm4/:number", async function (req, res) {
         wagonTypes.sm4,
         req.query.past || false
     );
-    console.log(`{${new Date().toLocaleString()}} Request from ${req.ip} to ${req.url}! Returned ${trainNumbers.past.length + trainNumbers.future.length} train(s)`);
+    log(req.ip, req.url, trainNumbers);
     res.send(trainNumbers);
 });
 
@@ -133,10 +169,10 @@ app.get("/sm5/:number", async function (req, res) {
         wagonTypes.sm5,
         req.query.past || false
     );
-    console.log(`{${new Date().toLocaleString()}} Request from ${req.ip} to ${req.url}! Returned ${trainNumbers.past.length + trainNumbers.future.length} train(s)`);
+    log(req.ip, req.url, trainNumbers);
     res.send(trainNumbers);
 });
 
 app.listen(port, () => {
-    console.log(`Running on port ${port}`)
-})
+    console.log(`Running on port ${port}`);
+});
