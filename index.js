@@ -6,6 +6,13 @@ import { apiUrl, wagonTypes } from "./constants.js";
 const app = express();
 const port = 4282;
 
+/**
+ * 
+ * @param {String} number 
+ * @param {String} type 
+ * @param {String} past 
+ * @returns 
+ */
 async function findWagon(number, type, past) {
     var headers = {
         "Accept-Encoding": "gzip",
@@ -98,29 +105,35 @@ var wagonNumberWithLeadingZero = (num) => {
 };
 
 app.get("/sm2/:number", async function (req, res) {
+    const number = wagonNumberWithLeadingZero(req.params.number);
     const trainNumbers = await findWagon(
-        wagonNumberWithLeadingZero(req.params.number),
+        number,
         wagonTypes.sm2,
         req.query.past || false
     );
+    console.log(`Request from ${req.ip} to ${req.url}! Returned ${trainNumbers.past.length + trainNumbers.future.length} train(s)`);
     res.send(trainNumbers);
 });
 
 app.get("/sm4/:number", async function (req, res) {
+    const number = wagonNumberWithLeadingZero(req.params.number);
     const trainNumbers = await findWagon(
-        wagonNumberWithLeadingZero(req.params.number),
+        number,
         wagonTypes.sm4,
         req.query.past || false
     );
+    console.log(`Request from ${req.ip} to ${req.url}! Returned ${trainNumbers.past.length + trainNumbers.future.length} train(s)`);
     res.send(trainNumbers);
 });
 
 app.get("/sm5/:number", async function (req, res) {
+    const number = wagonNumberWithLeadingZero(req.params.number);
     const trainNumbers = await findWagon(
-        wagonNumberWithLeadingZero(req.params.number),
+        number,
         wagonTypes.sm5,
         req.query.past || false
     );
+    console.log(`Request from ${req.ip} to ${req.url}! Returned ${trainNumbers.past.length + trainNumbers.future.length} train(s)`);
     res.send(trainNumbers);
 });
 
