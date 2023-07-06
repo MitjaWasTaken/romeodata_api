@@ -111,7 +111,7 @@ app.get("/sm2/:number", async function (req, res) {
         wagonTypes.sm2,
         req.query.past || false
     );
-    console.log(`Request from ${req.ip} to ${req.url}! Returned ${trainNumbers.past.length + trainNumbers.future.length} train(s)`);
+    console.log(`{${new Date().toLocaleString()}} Request from ${req.ip} to ${req.url}! Returned ${trainNumbers.past.length + trainNumbers.future.length} train(s)`);
     res.send(trainNumbers);
 });
 
@@ -122,7 +122,7 @@ app.get("/sm4/:number", async function (req, res) {
         wagonTypes.sm4,
         req.query.past || false
     );
-    console.log(`Request from ${req.ip} to ${req.url}! Returned ${trainNumbers.past.length + trainNumbers.future.length} train(s)`);
+    console.log(`{${new Date().toLocaleString()}} Request from ${req.ip} to ${req.url}! Returned ${trainNumbers.past.length + trainNumbers.future.length} train(s)`);
     res.send(trainNumbers);
 });
 
@@ -133,7 +133,7 @@ app.get("/sm5/:number", async function (req, res) {
         wagonTypes.sm5,
         req.query.past || false
     );
-    console.log(`Request from ${req.ip} to ${req.url}! Returned ${trainNumbers.past.length + trainNumbers.future.length} train(s)`);
+    console.log(`{${new Date().toLocaleString()}} Request from ${req.ip} to ${req.url}! Returned ${trainNumbers.past.length + trainNumbers.future.length} train(s)`);
     res.send(trainNumbers);
 });
 
