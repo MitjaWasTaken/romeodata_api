@@ -1,11 +1,16 @@
 import express from "express";
 import fetch from "node-fetch";
+import NodeCache from "node-cache";
+const cache = new NodeCache();
+
 import { appendFile, writeFile } from "fs";
 
 import { apiUrl, wagonTypes } from "./constants.js";
 
 const app = express();
 const port = 4282;
+
+var last_date = "";
 
 const logFilePath = `./logs/${new Date().toLocaleDateString("fi", {
     day: "numeric",
@@ -46,9 +51,19 @@ async function findWagon(number, type, past) {
         (day < 10 ? "0" : "") + day
     }`;
 
-    const url = `${apiUrl}/compositions/${departure_date}`;
-    const response = await fetch(url, { method: "GET", headers: headers });
-    const json = await response.json();
+    // If data has already been retrieved today from digitraffic's api it will be retrieved from cache instead
+    let json;
+    if (departure_date == last_date) {
+        json = cache.get("compositions");
+    } else {
+        last_date = departure_date;
+
+        const url = `${apiUrl}/compositions/${departure_date}`;
+        const response = await fetch(url, { method: "GET", headers: headers });
+        json = await response.json();
+
+        cache.set("compositions", json);
+    }
 
     var allTrainNumbers = findTrainNumbers(json, number, type);
 
@@ -90,7 +105,7 @@ async function findWagon(number, type, past) {
         // Train has been driven
         else {
             if (past != "true") continue;
-            pastTrainNumbers[trainNumber] = trainInfo[0];
+            pastTrainNumbers.push(parsedTrainInfo);
         }
     }
 
