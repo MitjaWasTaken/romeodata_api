@@ -31,6 +31,13 @@ fs.writeFile(
     }
 );
 
+function time_sort(a, b) {
+    return (
+        new Date(a.scheduleStartStation.scheduledTime).getTime() -
+        new Date(b.scheduleStartStation.scheduledTime).getTime()
+    );
+}
+
 /**
  *
  * @param {String} number
@@ -72,10 +79,6 @@ async function findWagon(number, type, past) {
     var pastTrainNumbers = [];
     var futureTrainNumbers = [];
 
-    var trainNumbersJSON = {
-        past: pastTrainNumbers,
-        future: futureTrainNumbers,
-    };
     const currentTimeISO8601 = new Date().toISOString();
 
     for (var index in json) {
@@ -110,6 +113,11 @@ async function findWagon(number, type, past) {
             pastTrainNumbers.push(parsedTrainInfo);
         }
     }
+
+    var trainNumbersJSON = {
+        past: pastTrainNumbers,
+        future: futureTrainNumbers.sort(time_sort),
+    };
 
     return trainNumbersJSON;
 }
