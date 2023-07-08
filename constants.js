@@ -6,4 +6,4 @@ const wagonTypes = {
     sm5: "Sm5",
 };
 
-export { apiUrl, wagonTypes };
+module.exports = { apiUrl, wagonTypes };

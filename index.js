@@ -1,13 +1,15 @@
-import express from "express";
-import fetch from "node-fetch";
-import NodeCache from "node-cache";
+const express = require("express");
+const fetch = require("node-fetch");
+const NodeCache = require("node-cache");
 const cache = new NodeCache();
 
-import { appendFile, writeFile } from "fs";
+const fs = require("fs");
 
-import { apiUrl, wagonTypes } from "./constants.js";
+const constants = require("./constants.js");
+const pushNotificationController = require("./controllers/push-notification.controller.js");
 
 const app = express();
+app.use(express.json());
 const port = 4282;
 
 var last_date = "";
@@ -20,7 +22,7 @@ const logFilePath = `./logs/${new Date().toLocaleDateString("fi", {
     minute: "numeric",
     second: "numeric",
 })}`;
-writeFile(
+fs.writeFile(
     logFilePath,
     `Log starting form ${Date().toLocaleString()}:\n\n`,
     function (err) {
@@ -58,7 +60,7 @@ async function findWagon(number, type, past) {
     } else {
         last_date = departure_date;
 
-        const url = `${apiUrl}/compositions/${departure_date}`;
+        const url = `${constants.apiUrl}/compositions/${departure_date}`;
         const response = await fetch(url, { method: "GET", headers: headers });
         json = await response.json();
 
@@ -81,7 +83,7 @@ async function findWagon(number, type, past) {
         if (!allTrainNumbers.includes(trainNumber)) {
             continue;
         }
-        const url = `${apiUrl}/trains/${departure_date}/${trainNumber}`;
+        const url = `${constants.apiUrl}/trains/${departure_date}/${trainNumber}`;
         const response = await fetch(url, { method: "GET", headers: headers });
         const trainInfo = await response.json();
         const parsedTrainInfo = {
@@ -149,7 +151,7 @@ function log(ip, url, trainNumbers) {
     } train(s)`;
 
     console.log(log);
-    appendFile(logFilePath, log + "\n", function (err) {
+    fs.appendFile(logFilePath, log + "\n", function (err) {
         if (err) console.error(err);
         return;
     });
@@ -159,7 +161,7 @@ app.get("/sm2/:number", async function (req, res) {
     const number = wagonNumberWithLeadingZero(req.params.number);
     const trainNumbers = await findWagon(
         number,
-        wagonTypes.sm2,
+        constants.wagonTypes.sm2,
         req.query.past || false
     );
     log(req.ip, req.url, trainNumbers);
@@ -170,7 +172,7 @@ app.get("/sm4/:number", async function (req, res) {
     const number = wagonNumberWithLeadingZero(req.params.number);
     const trainNumbers = await findWagon(
         number,
-        wagonTypes.sm4,
+        constants.wagonTypes.sm4,
         req.query.past || false
     );
     log(req.ip, req.url, trainNumbers);
@@ -181,12 +183,14 @@ app.get("/sm5/:number", async function (req, res) {
     const number = wagonNumberWithLeadingZero(req.params.number);
     const trainNumbers = await findWagon(
         number,
-        wagonTypes.sm5,
+        constants.wagonTypes.sm5,
         req.query.past || false
     );
     log(req.ip, req.url, trainNumbers);
     res.send(trainNumbers);
 });
+
+app.post("/send-notification", pushNotificationController.sendPushNotification);
 
 app.listen(port, () => {
     console.log(`Running on port ${port}`);
