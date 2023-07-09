@@ -115,7 +115,7 @@ async function findWagon(number, type, past) {
     }
 
     var trainNumbersJSON = {
-        past: pastTrainNumbers,
+        past: pastTrainNumbers.sort(time_sort),
         future: futureTrainNumbers.sort(time_sort),
     };
 
