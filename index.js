@@ -49,6 +49,7 @@ async function findWagon(number, type, past) {
     var headers = {
         "Accept-Encoding": "gzip",
         "Content-Type": "application/json",
+        "Digitraffic-User": "MitjaWasTaken/Romeodata 0.0.1"
     };
 
     const d = new Date();
